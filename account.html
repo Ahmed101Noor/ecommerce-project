@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account - SHOP.CO</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <div class="user-actions">
+    <a href="login.html" id="login-link">Login</a>
+    <a href="register.html" id="register-link">Register</a>
+  </div>
+  
+</head>
+<body>
+  <header>
+    <!-- Same header as other pages -->
+  </header>
+
+  <main class="account-container">
+    <div class="account-sidebar">
+      <div class="account-info">
+        <div class="avatar">👤</div>
+        <h3 id="account-name">User Name</h3>
+        <p id="account-email">user@example.com</p>
+      </div>
+      <nav class="account-menu">
+        <a href="#dashboard" class="active">Dashboard</a>
+        <a href="#orders">My Orders</a>
+        <a href="#wishlist">Wishlist</a>
+        <a href="#settings">Account Settings</a>
+        <a href="#" id="logout-btn">Logout</a>
+      </nav>
+    </div>
+
+    <div class="account-content">
+      <!-- Dashboard Section -->
+      <section id="dashboard-section" class="account-section active">
+        <h2>Account Dashboard</h2>
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <h3>Total Orders</h3>
+            <p id="total-orders">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Wishlist Items</h3>
+            <p id="wishlist-count">0</p>
+          </div>
+        </div>
+        <div class="recent-orders">
+          <h3>Recent Orders</h3>
+          <table id="recent-orders-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Orders will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Orders Section -->
+      <section id="orders-section" class="account-section">
+        <h2>My Orders</h2>
+        <div class="orders-list" id="orders-list">
+          <!-- Orders will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Wishlist Section -->
+      <section id="wishlist-section" class="account-section">
+        <h2>My Wishlist</h2>
+        <div class="products-grid" id="wishlist-products">
+          <!-- Wishlist items will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settings-section" class="account-section">
+        <h2>Account Settings</h2>
+        <form id="account-form">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label for="current-password">Current Password</label>
+            <input type="password" id="current-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password">New Password</label>
+            <input type="password" id="new-password">
+          </div>
+          <button type="submit" class="btn">Save Changes</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <!-- Same footer as other pages -->
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/orders.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = ECommerce.getCurrentUser();
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Load user info
+      document.getElementById('account-name').textContent = user.name;
+      document.getElementById('account-email').textContent = user.email;
+      document.getElementById('name').value = user.name;
+      document.getElementById('email').value = user.email;
+
+      // Setup menu navigation
+      document.querySelectorAll('.account-menu a').forEach(link => {
+        if (link.hash) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.account-section').forEach(section => {
+              section.classList.remove('active');
+            });
+            document.querySelectorAll('.account-menu a').forEach(a => {
+              a.classList.remove('active');
+            });
+            this.classList.add('active');
+            document.querySelector(this.hash).classList.add('active');
+          });
+        }
+      });
+
+      // Load dashboard data
+      loadDashboardData();
+      loadOrders();
+      loadWishlist();
+
+      // Logout button
+      document.getElementById('logout-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        Auth.logout();
+        window.location.href = 'index.html';
+      });
+
+      // Account form submission
+      document.getElementById('account-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateAccount();
+      });
+    });
+
+    function loadDashboardData() {
+      const user = ECommerce.getCurrentUser();
+      const orders = Orders.getAll().filter(o => o.customerId === user.id);
+      
+      // Update stats
+      document.getElementById('total-orders').textContent = orders.length;
+      
+      // Update wishlist count
+      const wishlists = JSON.parse(localStorage.getItem('wishlists')) || {};
+      const wishlistCount = wishlists[user.id] ? wishlists[user.id].length : 0;
+      document.getElementById('wishlist-count').textContent = wishlistCount;
+      
+      // Show recent orders
+      const recentOrders = orders.slice(0, 3);
+      const tbody = document.querySelector('#recent-orders-table tbody');
+      tbody.innerHTML = '';
+      
+      recentOrders.forEach(order => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${order.id.substr(0, 8)}</td>
+          <td>${new Date(order.date).toLocaleDateString()}</td>
+          <td>${order.items.length}</td>
+          <td>$${order.total.toFixed(2)}</td>
+          <td class="status-${order.status}">${order.status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadOrders() {
+      const user = ECommerce.getCurrentUser();
+      const orders = Orders.getAll().filter(o => o.customerId === user.id);
+      const ordersList = document.getElementById('orders-list');
+      
+      if (orders.length === 0) {
+        ordersList.innerHTML = '<p>You have no orders yet.</p>';
+        return;
+      }
+      
+      ordersList.innerHTML = '';
+      
+      orders.forEach(order => {
+        const orderEl = document.createElement('div');
+        orderEl.className = 'order-card';
+        orderEl.innerHTML = `
+          <div class="order-header">
+            <div>
+              <span class="order-id">Order #${order.id.substr(0, 8)}</span>
+              <span class="order-date">${new Date(order.date).toLocaleDateString()}</span>
+            </div>
+            <div class="order-status status-${order.status}">${order.status}</div>
+          </div>
+          <div class="order-items">
+            ${order.items.map(item => {
+              const product = Products.getById(item.productId);
+              return `
+                <div class="order-item">
+                  <img src="${product.image || 'assets/images/placeholder.jpg'}" alt="${product.name}">
+                  <div>
+                    <h4>${product.name}</h4>
+                    <div>Qty: ${item.quantity}</div>
+                    <div>$${(product.price * item.quantity).toFixed(2)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="order-footer">
+            <div class="order-total">Total: $${order.total.toFixed(2)}</div>
+            ${order.status === 'delivered' ? 
+              `<button class="btn" onclick="requestReturn('${order.id}')">Request Return</button>` : ''}
+          </div>
+        `;
+        ordersList.appendChild(orderEl);
+      });
+    }
+
+    function loadWishlist() {
+      const user = ECommerce.getCurrentUser();
+      const wishlists = JSON.parse(localStorage.getItem('wishlists')) || {};
+      const wishlist = wishlists[user.id] || [];
+      const container = document.getElementById('wishlist-products');
+      
+      if (wishlist.length === 0) {
+        container.innerHTML = '<p>Your wishlist is empty.</p>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      wishlist.forEach(productId => {
+        const product = Products.getById(productId);
+        if (!product) return;
+        
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+          <img src="${product.image || 'assets/images/placeholder.jpg'}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <div class="price">$${product.price.toFixed(2)}</div>
+          <button onclick="addToCartFromWishlist('${product.id}')">Add to Cart</button>
+          <button class="btn-remove" onclick="removeFromWishlist('${product.id}')">Remove</button>
+        `;
+        container.appendChild(productCard);
+      });
+    }
+
+    function updateAccount() {
+      const user = ECommerce.getCurrentUser();
+      const users = JSON.parse(localStorage.getItem('users'));
+      const currentUser = users.find(u => u.id === user.id);
+      
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+      
+      // Validate email
+      if (email !== currentUser.email && users.some(u => u.email === email)) {
+        alert('Email already in use by another account');
+        return;
+      }
+      
+      // Validate password change
+      if (newPassword && currentPassword !== currentUser.password) {
+        alert('Current password is incorrect');
+        return;
+      }
+      
+      // Update user
+      currentUser.name = name;
+      currentUser.email = email;
+      if (newPassword) currentUser.password = newPassword;
+      
+      // Save changes
+      localStorage.setItem('users', JSON.stringify(users));
+      ECommerce.setCurrentUser(currentUser);
+      
+      // Update UI
+      document.getElementById('account-name').textContent = name;
+      document.getElementById('account-email').textContent = email;
+      
+      alert('Account updated successfully');
+      document.getElementById('current-password').value = '';
+      document.getElementById('new-password').value = '';
+    }
+
+    function addToCartFromWishlist(productId) {
+      try {
+        Cart.addToCart(productId, 1);
+        alert('Product added to cart!');
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function removeFromWishlist(productId) {
+      const user = ECommerce.getCurrentUser();
+      const wishlists = JSON.parse(localStorage.getItem('wishlists')) || {};
+      
+      if (wishlists[user.id]) {
+        wishlists[user.id] = wishlists[user.id].filter(id => id !== productId);
+        localStorage.setItem('wishlists', JSON.stringify(wishlists));
+        loadWishlist();
+        loadDashboardData();
+      }
+    }
+
+    function requestReturn(orderId) {
+      if (confirm('Are you sure you want to request a return for this order?')) {
+        Orders.updateStatus(orderId, 'return requested');
+        loadOrders();
+        loadDashboardData();
+        alert('Return request submitted. We will contact you soon.');
+      }
+    }
+  </script>
+</body>
+</html>

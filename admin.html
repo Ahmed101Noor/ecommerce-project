@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - SHOP.CO</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <div class="user-actions">
+    <a href="login.html" id="login-link">Login</a>
+    <a href="register.html" id="register-link">Register</a>
+  </div>
+</head>
+<body>
+  <header>
+    <div class="logo">SHOP.CO</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="admin.html" class="active">Admin</a></li>
+      </ul>
+    </nav>
+    <div class="user-actions">
+      <a href="#" id="logout-btn">Logout</a>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <div class="admin-sidebar">
+      <h3>Admin Dashboard</h3>
+      <nav class="admin-menu">
+        <a href="#dashboard" class="active">Dashboard</a>
+        <a href="#products">Products</a>
+        <a href="#categories">Categories</a>
+        <a href="#orders">Orders</a>
+        <a href="#users">Users</a>
+        <a href="#admins">Admins</a>
+      </nav>
+    </div>
+
+    <div class="admin-content">
+      <!-- Dashboard Section -->
+      <section id="dashboard-section" class="admin-section active">
+        <h2>Admin Dashboard</h2>
+        <div class="admin-stats">
+          <div class="stat-card">
+            <h3>Total Products</h3>
+            <p id="total-products">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Pending Orders</h3>
+            <p id="pending-orders">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Total Customers</h3>
+            <p id="total-customers">0</p>
+          </div>
+        </div>
+        <div class="recent-orders">
+          <h3>Recent Orders</h3>
+          <table id="admin-orders-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Orders will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section id="products-section" class="admin-section">
+        <div class="admin-header">
+          <h2>Manage Products</h2>
+          <button class="btn" id="add-product-btn">Add New Product</button>
+        </div>
+        <table id="products-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Products will be loaded here -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Categories Section -->
+      <section id="categories-section" class="admin-section">
+        <div class="admin-header">
+          <h2>Manage Categories</h2>
+          <div class="add-category">
+            <input type="text" id="new-category" placeholder="New category name">
+            <button class="btn" id="add-category-btn">Add</button>
+          </div>
+        </div>
+        <div class="categories-list" id="categories-list">
+          <!-- Categories will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Orders Section -->
+      <section id="orders-section" class="admin-section">
+        <h2>Manage Orders</h2>
+        <div class="admin-orders" id="admin-orders">
+          <!-- Orders will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Users Section -->
+      <section id="users-section" class="admin-section">
+        <h2>Manage Customers</h2>
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Orders</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Users will be loaded here -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Admins Section -->
+      <section id="admins-section" class="admin-section">
+        <div class="admin-header">
+          <h2>Manage Admins</h2>
+          <button class="btn" id="add-admin-btn">Add New Admin</button>
+        </div>
+        <table id="admins-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Admins will be loaded here -->
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+
+  <!-- Product Modal -->
+  <div class="modal" id="product-modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="product-modal-title">Add New Product</h2>
+      <form id="product-form">
+        <input type="hidden" id="product-id">
+        <div class="form-group">
+          <label for="product-name">Product Name</label>
+          <input type="text" id="product-name" required>
+        </div>
+        <div class="form-group">
+          <label for="product-category">Category</label>
+          <select id="product-category" required>
+            <!-- Categories will be loaded here -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="product-price">Price</label>
+          <input type="number" id="product-price" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="product-stock">Stock Quantity</label>
+          <input type="number" id="product-stock" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="product-description">Description</label>
+          <textarea id="product-description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="product-image">Image URL</label>
+          <input type="text" id="product-image">
+        </div>
+        <button type="submit" class="btn">Save Product</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal" id="admin-modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add New Admin</h2>
+      <form id="admin-form">
+        <div class="form-group">
+          <label for="admin-name">Full Name</label>
+          <input type="text" id="admin-name" required>
+        </div>
+        <div class="form-group">
+          <label for="admin-email">Email</label>
+          <input type="email" id="admin-email" required>
+        </div>
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" required>
+        </div>
+        <button type="submit" class="btn">Create Admin</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/orders.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check admin status
+      if (!Auth.isAdmin()) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Setup menu navigation
+      document.querySelectorAll('.admin-menu a').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
+          });
+          document.querySelector(this.hash).classList.add('active');
+        });
+      });
+
+      // Load initial data
+      loadDashboardData();
+      loadProducts();
+      loadCategories();
+      loadAllOrders();
+      loadUsers();
+      loadAdmins();
+
+      // Setup modals
+      setupProductModal();
+      setupAdminModal();
+
+      // Logout button
+      document.getElementById('logout-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        Auth.logout();
+        window.location.href = 'index.html';
+      });
+
+      // Add category
+      document.getElementById('add-category-btn').addEventListener('click', addCategory);
+    });
+
+    function loadDashboardData() {
+      const products = Products.getAll();
+      const orders = Orders.getAll();
+      const users = Auth.getAllUsers().filter(u => u.type === 'customer');
+      
+      document.getElementById('total-products').textContent = products.length;
+      document.getElementById('pending-orders').textContent = 
+        orders.filter(o => o.status === 'pending').length;
+      document.getElementById('total-customers').textContent = users.length;
+      
+      // Load recent orders
+      const tbody = document.querySelector('#admin-orders-table tbody');
+      tbody.innerHTML = '';
+      
+      orders.slice(0, 5).forEach(order => {
+        const user = Auth.getAllUsers().find(u => u.id === order.customerId);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${order.id.substr(0, 8)}</td>
+          <td>${user ? user.name : 'Unknown'}</td>
+          <td>${new Date(order.date).toLocaleDateString()}</td>
+          <td>$${order.total.toFixed(2)}</td>
+          <td class="status-${order.status}">${order.status}</td>
+          <td>
+            <button class="btn-small" onclick="viewOrderDetails('${order.id}')">View</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadProducts() {
+      const products = Products.getAll();
+      const tbody = document.querySelector('#products-table tbody');
+      tbody.innerHTML = '';
+      
+      products.forEach(product => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${product.id.substr(0, 8)}</td>
+          <td>${product.name}</td>
+          <td>${product.category}</td>
+          <td>$${product.price.toFixed(2)}</td>
+          <td>${product.stockQuantity}</td>
+          <td>
+            <button class="btn-small" onclick="editProduct('${product.id}')">Edit</button>
+            <button class="btn-small btn-danger" onclick="deleteProduct('${product.id}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadCategories() {
+      const categories = JSON.parse(localStorage.getItem('categories')) || [];
+      const container = document.getElementById('categories-list');
+      container.innerHTML = '';
+      
+      categories.forEach(category => {
+        const categoryEl = document.createElement('div');
+        categoryEl.className = 'category-item';
+        categoryEl.innerHTML = `
+          <span>${category}</span>
+          <button class="btn-small btn-danger" onclick="deleteCategory('${category}')">Delete</button>
+        `;
+        container.appendChild(categoryEl);
+      });
+      
+      // Also load categories in product modal select
+      const categorySelect = document.getElementById('product-category');
+      categorySelect.innerHTML = '';
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    function loadAllOrders() {
+      const orders = Orders.getAll();
+      const container = document.getElementById('admin-orders');
+      container.innerHTML = '';
+      
+      if (orders.length === 0) {
+        container.innerHTML = '<p>No orders found.</p>';
+        return;
+      }
+      
+      orders.forEach(order => {
+        const user = Auth.getAllUsers().find(u => u.id === order.customerId);
+        const orderEl = document.createElement('div');
+        orderEl.className = 'order-card';
+        orderEl.innerHTML = `
+          <div class="order-header">
+            <div>
+              <span class="order-id">Order #${order.id.substr(0, 8)}</span>
+              <span class="customer-name">${user ? user.name : 'Unknown'}</span>
+            </div>
+            <div class="order-status status-${order.status}">${order.status}</div>
+          </div>
+          <div class="order-details">
+            <div>Date: ${new Date(order.date).toLocaleDateString()}</div>
+            <div>Items: ${order.items.length}</div>
+            <div>Total: $${order.total.toFixed(2)}</div>
+          </div>
+          <div class="order-actions">
+            ${order.status === 'pending' ? `
+              <button class="btn-small" onclick="updateOrderStatus('${order.id}', 'confirmed')">Confirm</button>
+              <button class="btn-small btn-danger" onclick="updateOrderStatus('${order.id}', 'rejected')">Reject</button>
+            ` : ''}
+            ${order.status === 'return requested' ? `
+              <button class="btn-small" onclick="updateOrderStatus('${order.id}', 'returned')">Approve Return</button>
+            ` : ''}
+            <button class="btn-small" onclick="viewOrderDetails('${order.id}')">View Details</button>
+          </div>
+        `;
+        container.appendChild(orderEl);
+      });
+    }
+
+    function loadUsers() {
+      const users = Auth.getAllUsers().filter(u => u.type === 'customer');
+      const tbody = document.querySelector('#users-table tbody');
+      tbody.innerHTML = '';
+      
+      users.forEach(user => {
+        const orders = Orders.getAll().filter(o => o.customerId === user.id);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${user.id.substr(0, 8)}</td>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${orders.length}</td>
+          <td>${new Date().toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadAdmins() {
+      const admins = Auth.getAllUsers().filter(u => u.type === 'admin');
+      const tbody = document.querySelector('#admins-table tbody');
+      tbody.innerHTML = '';
+      
+      admins.forEach(admin => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${admin.id.substr(0, 8)}</td>
+          <td>${admin.name}</td>
+          <td>${admin.email}</td>
+          <td>
+            ${admin.id !== ECommerce.getCurrentUser().id ? `
+              <button class="btn-small btn-danger" onclick="deleteAdmin('${admin.id}')">Remove</button>
+            ` : 'Current admin'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function setupProductModal() {
+      const modal = document.getElementById('product-modal');
+      const btn = document.getElementById('add-product-btn');
+      const span = document.querySelector('#product-modal .close');
+      
+      btn.addEventListener('click', function() {
+        document.getElementById('product-form').reset();
+        document.getElementById('product-id').value = '';
+        document.getElementById('product-modal-title').textContent = 'Add New Product';
+        modal.style.display = 'block';
+      });
+      
+      span.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+      
+      window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('product-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveProduct();
+      });
+    }
+
+    function setupAdminModal() {
+      const modal = document.getElementById('admin-modal');
+      const btn = document.getElementById('add-admin-btn');
+      const span = document.querySelector('#admin-modal .close');
+      
+      btn.addEventListener('click', function() {
+        document.getElementById('admin-form').reset();
+        modal.style.display = 'block';
+      });
+      
+      span.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+      
+      window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('admin-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addAdmin();
+      });
+    }
+
+    function editProduct(id) {
+      const product = Products.getById(id);
+      if (!product) return;
+      
+      document.getElementById('product-id').value = product.id;
+      document.getElementById('product-name').value = product.name;
+      document.getElementById('product-category').value = product.category;
+      document.getElementById('product-price').value = product.price;
+      document.getElementById('product-stock').value = product.stockQuantity;
+      document.getElementById('product-description').value = product.description;
+      document.getElementById('product-image').value = product.image || '';
+      
+      document.getElementById('product-modal-title').textContent = 'Edit Product';
+      document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function saveProduct() {
+      const id = document.getElementById('product-id').value;
+      const productData = {
+        name: document.getElementById('product-name').value,
+        category: document.getElementById('product-category').value,
+        price: parseFloat(document.getElementById('product-price').value),
+        stockQuantity: parseInt(document.getElementById('product-stock').value),
+        description: document.getElementById('product-description').value,
+        image: document.getElementById('product-image').value
+      };
+      
+      try {
+        if (id) {
+          Products.update(id, productData);
+        } else {
+          Products.create(productData);
+        }
+        
+        document.getElementById('product-modal').style.display = 'none';
+        loadProducts();
+        loadDashboardData();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function deleteProduct(id) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        Products.delete(id);
+        loadProducts();
+        loadDashboardData();
+      }
+    }
+
+    function addCategory() {
+      const name = document.getElementById('new-category').value.trim();
+      if (!name) return;
+      
+      const categories = JSON.parse(localStorage.getItem('categories')) || [];
+      if (categories.includes(name)) {
+        alert('Category already exists');
+        return;
+      }
+      
+      categories.push(name);
+      localStorage.setItem('categories', JSON.stringify(categories));
+      document.getElementById('new-category').value = '';
+      loadCategories();
+    }
+
+    function deleteCategory(name) {
+      if (confirm(`Are you sure you want to delete the category "${name}"? Products in this category will not be deleted.`)) {
+        const categories = JSON.parse(localStorage.getItem('categories')) || [];
+        const updated = categories.filter(c => c !== name);
+        localStorage.setItem('categories', JSON.stringify(updated));
+        loadCategories();
+      }
+    }
+
+    function updateOrderStatus(orderId, status) {
+      Orders.updateStatus(orderId, status);
+      loadAllOrders();
+      loadDashboardData();
+    }
+
+    function viewOrderDetails(orderId) {
+      const order = Orders.getAll().find(o => o.id === orderId);
+      if (!order) return;
+      
+      const user = Auth.getAllUsers().find(u => u.id === order.customerId);
+      
+      let details = `
+        <h3>Order #${order.id.substr(0, 8)}</h3>
+        <p><strong>Customer:</strong> ${user ? user.name : 'Unknown'}</p>
+        <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+        <p><strong>Status:</strong> <span class="status-${order.status}">${order.status}</span></p>
+        <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+        
+        <h4>Shipping Information</h4>
+        ${order.shippingInfo ? `
+          <p>${order.shippingInfo.address}</p>
+          <p>${order.shippingInfo.city}, ${order.shippingInfo.zip}</p>
+          <p>${order.shippingInfo.country}</p>
+        ` : '<p>No shipping information available</p>'}
+        
+        <h4>Order Items</h4>
+        <ul class="order-items-list">
+      `;
+      
+      order.items.forEach(item => {
+        const product = Products.getById(item.productId);
+        if (product) {
+          details += `
+            <li>
+              <img src="${product.image || 'assets/images/placeholder.jpg'}" alt="${product.name}">
+              <div>
+                <h5>${product.name}</h5>
+                <p>Qty: ${item.quantity}</p>
+                <p>Price: $${product.price.toFixed(2)}</p>
+                <p>Subtotal: $${(product.price * item.quantity).toFixed(2)}</p>
+              </div>
+            </li>
+          `;
+        }
+      });
+      
+      details += '</ul>';
+      
+      alert(details); // In a real app, you'd use a proper modal
+    }
+
+    function addAdmin() {
+      const name = document.getElementById('admin-name').value;
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+      
+      try {
+        Auth.createAdmin(email, password, name);
+        document.getElementById('admin-modal').style.display = 'none';
+        loadAdmins();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function deleteAdmin(id) {
+      if (confirm('Are you sure you want to remove this admin?')) {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const updated = users.filter(u => u.id !== id);
+        localStorage.setItem('users', JSON.stringify(updated));
+        loadAdmins();
+      }
+    }
+  </script>
+</body>
+</html>

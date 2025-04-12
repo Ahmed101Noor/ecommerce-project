@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop - SHOP.CO</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <div class="user-actions">
+    <a href="login.html" id="login-link">Login</a>
+    <a href="register.html" id="register-link">Register</a>
+  </div>
+</head>
+<body>
+  <header>
+    <div class="logo">SHOP.CO</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop.html" class="active">Shop</a></li>
+        <li><a href="#">On Sale</a></li>
+        <li><a href="#">New Arrivals</a></li>
+      </ul>
+    </nav>
+    <div class="search">
+      <input type="text" id="search-input" placeholder="Search for products...">
+    </div>
+    <div class="user-actions">
+      <a href="account.html" id="account-link">Account</a>
+      <a href="cart.html" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="shop-header">
+      <h1>Shop</h1>
+      <div class="filters">
+        <select id="category-filter">
+          <option value="">All Categories</option>
+        </select>
+        <select id="sort-by">
+          <option value="default">Default Sorting</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="name-asc">Name: A-Z</option>
+          <option value="name-desc">Name: Z-A</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="products-grid" id="products-grid">
+      <!-- Products will be loaded via JavaScript -->
+    </section>
+  </main>
+
+  <footer>
+    <!-- Footer content -->
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+      loadCategories();
+      loadProducts();
+      
+      // Event listeners for filters
+      document.getElementById('category-filter').addEventListener('change', loadProducts);
+      document.getElementById('sort-by').addEventListener('change', loadProducts);
+      document.getElementById('search-input').addEventListener('input', loadProducts);
+    });
+
+    function updateCartCount() {
+      const count = Cart.getCart().reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+    }
+
+    function loadCategories() {
+      const categories = JSON.parse(localStorage.getItem('categories')) || [];
+      const filter = document.getElementById('category-filter');
+      
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        filter.appendChild(option);
+      });
+    }
+
+    function loadProducts() {
+      const category = document.getElementById('category-filter').value;
+      const sortBy = document.getElementById('sort-by').value;
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      
+      let products = Products.getAll();
+      
+      // Apply filters
+      if (category) {
+        products = products.filter(p => p.category === category);
+      }
+      
+      if (searchTerm) {
+        products = products.filter(p => 
+          p.name.toLowerCase().includes(searchTerm) || 
+          p.description.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Apply sorting
+      switch(sortBy) {
+        case 'price-low':
+          products.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-high':
+          products.sort((a, b) => b.price - a.price);
+          break;
+        case 'name-asc':
+          products.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'name-desc':
+          products.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+      }
+      
+      // Render products
+      const grid = document.getElementById('products-grid');
+      grid.innerHTML = '';
+      
+      if (products.length === 0) {
+        grid.innerHTML = '<p>No products found matching your criteria.</p>';
+        return;
+      }
+      
+      products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+          <img src="${product.image || 'assets/images/placeholder.jpg'}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <div class="price">$${product.price.toFixed(2)}</div>
+          <button onclick="location.href='product.html?id=${product.id}'">View Details</button>
+        `;
+        grid.appendChild(productCard);
+      });
+    }
+  </script>
+</body>
+</html>

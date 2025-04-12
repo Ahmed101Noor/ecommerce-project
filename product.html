@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product - SHOP.CO</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <div class="user-actions">
+    <a href="login.html" id="login-link">Login</a>
+    <a href="register.html" id="register-link">Register</a>
+  </div>
+</head>
+<body>
+  <header>
+    <div class="logo">SHOP.CO</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="#">On Sale</a></li>
+        <li><a href="#">New Arrivals</a></li>
+      </ul>
+    </nav>
+    <div class="search">
+      <input type="text" placeholder="Search for products...">
+    </div>
+    <div class="user-actions">
+      <a href="account.html" id="account-link">Account</a>
+      <a href="cart.html" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumbs">
+      <a href="index.html">Home</a> > 
+      <a href="shop.html">Shop</a> > 
+      <span id="product-category-breadcrumb"></span> > 
+      <span id="product-name-breadcrumb"></span>
+    </div>
+
+    <section class="product-detail">
+      <div class="product-images">
+        <img id="main-product-image" src="" alt="Main product image">
+        <div class="thumbnail-container" id="thumbnails">
+          <!-- Thumbnails will be loaded via JavaScript -->
+        </div>
+      </div>
+      
+      <div class="product-info">
+        <h1 id="product-name"></h1>
+        <div class="price" id="product-price"></div>
+        <div class="rating">
+          <span class="stars">★★★★★</span>
+          <span id="review-count">(0 reviews)</span>
+        </div>
+        <p class="description" id="product-description"></p>
+        
+        <div class="size-selector">
+          <label>Size:</label>
+          <select id="size-select">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+            <option value="x-large">X-Large</option>
+          </select>
+        </div>
+        
+        <div class="color-selector">
+          <label>Color:</label>
+          <div class="color-options">
+            <button class="color-option white selected" data-color="white"></button>
+            <button class="color-option black" data-color="black"></button>
+            <button class="color-option red" data-color="red"></button>
+            <button class="color-option blue" data-color="blue"></button>
+          </div>
+        </div>
+        
+        <div class="quantity-selector">
+          <label>Quantity:</label>
+          <input type="number" id="quantity" min="1" value="1">
+        </div>
+        
+        <div class="product-actions">
+          <button class="btn" id="add-to-cart">Add to Cart</button>
+          <button class="btn" id="add-to-wishlist">Add to Wishlist</button>
+        </div>
+      </div>
+    </section>
+    
+    <section class="product-tabs">
+      <div class="tab-headers">
+        <button class="tab-header active" data-tab="details">Product Details</button>
+        <button class="tab-header" data-tab="reviews">Rating & Reviews</button>
+        <button class="tab-header" data-tab="faqs">FAQs</button>
+      </div>
+      
+      <div class="tab-content active" id="details-tab">
+        <p id="full-description"></p>
+      </div>
+      
+      <div class="tab-content" id="reviews-tab">
+        <div class="reviews-container" id="reviews-container">
+          <!-- Reviews will be loaded via JavaScript -->
+        </div>
+        <form id="review-form">
+          <h3>Add Your Review</h3>
+          <div class="form-group">
+            <label>Rating:</label>
+            <div class="rating-input">
+              <span class="star" data-value="1">☆</span>
+              <span class="star" data-value="2">☆</span>
+              <span class="star" data-value="3">☆</span>
+              <span class="star" data-value="4">☆</span>
+              <span class="star" data-value="5">☆</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="review-text">Review:</label>
+            <textarea id="review-text" rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn">Submit Review</button>
+        </form>
+      </div>
+      
+      <div class="tab-content" id="faqs-tab">
+        <div class="faq-item">
+          <h3>What is the return policy?</h3>
+          <p>You can return any item within 30 days of purchase for a full refund.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How long does shipping take?</h3>
+          <p>Standard shipping takes 3-5 business days.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="related-products">
+      <h2>You Might Also Like</h2>
+      <div class="products-grid" id="related-products">
+        <!-- Related products will be loaded via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <!-- Footer content -->
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+      loadProduct();
+      setupTabs();
+      setupReviewForm();
+      
+      document.getElementById('add-to-cart').addEventListener('click', addToCart);
+      document.getElementById('add-to-wishlist').addEventListener('click', addToWishlist);
+    });
+
+    function updateCartCount() {
+      const count = Cart.getCart().reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+    }
+
+    function loadProduct() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      
+      if (!productId) {
+        window.location.href = 'shop.html';
+        return;
+      }
+      
+      const product = Products.getById(productId);
+      if (!product) {
+        window.location.href = 'shop.html';
+        return;
+      }
+      
+      // Populate product info
+      document.getElementById('product-name').textContent = product.name;
+      document.getElementById('product-name-breadcrumb').textContent = product.name;
+      document.getElementById('product-category-breadcrumb').textContent = product.category;
+      document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
+      document.getElementById('product-description').textContent = product.description;
+      document.getElementById('full-description').textContent = product.description;
+      document.getElementById('main-product-image').src = product.image || 'assets/images/placeholder.jpg';
+      
+      // Load thumbnails (for simplicity, using same image)
+      const thumbnails = document.getElementById('thumbnails');
+      for (let i = 0; i < 3; i++) {
+        const thumb = document.createElement('img');
+        thumb.src = product.image || 'assets/images/placeholder.jpg';
+        thumb.alt = `${product.name} thumbnail ${i+1}`;
+        thumb.addEventListener('click', () => {
+          document.getElementById('main-product-image').src = thumb.src;
+        });
+        thumbnails.appendChild(thumb);
+      }
+      
+      // Load related products
+      const related = Products.getByCategory(product.category)
+        .filter(p => p.id !== product.id)
+        .slice(0, 4);
+      
+      const relatedContainer = document.getElementById('related-products');
+      related.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.image || 'assets/images/placeholder.jpg'}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <div class="price">$${p.price.toFixed(2)}</div>
+          <button onclick="location.href='product.html?id=${p.id}'">View Details</button>
+        `;
+        relatedContainer.appendChild(card);
+      });
+      
+      // Load reviews if they exist
+      if (product.reviews && product.reviews.length > 0) {
+        document.getElementById('review-count').textContent = `(${product.reviews.length} reviews)`;
+        
+        const reviewsContainer = document.getElementById('reviews-container');
+        product.reviews.forEach(review => {
+          const reviewEl = document.createElement('div');
+          reviewEl.className = 'review';
+          reviewEl.innerHTML = `
+            <div class="review-header">
+              <div class="review-author">${review.author}</div>
+              <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+            </div>
+            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+            <div class="review-text">${review.text}</div>
+          `;
+          reviewsContainer.appendChild(reviewEl);
+        });
+      }
+    }
+
+    function setupTabs() {
+      const tabHeaders = document.querySelectorAll('.tab-header');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+          // Remove active class from all
+          tabHeaders.forEach(h => h.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked
+          header.classList.add('active');
+          const tabId = header.getAttribute('data-tab');
+          document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+      });
+    }
+
+    function setupReviewForm() {
+      const stars = document.querySelectorAll('.rating-input .star');
+      let selectedRating = 0;
+      
+      stars.forEach(star => {
+        star.addEventListener('click', () => {
+          selectedRating = parseInt(star.getAttribute('data-value'));
+          
+          // Update star display
+          stars.forEach((s, i) => {
+            s.textContent = i < selectedRating ? '★' : '☆';
+          });
+        });
+      });
+      
+      document.getElementById('review-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const user = ECommerce.getCurrentUser();
+        if (!user) {
+          alert('Please login to submit a review');
+          return;
+        }
+        
+        const reviewText = document.getElementById('review-text').value;
+        if (!selectedRating || !reviewText) {
+          alert('Please provide both a rating and review text');
+          return;
+        }
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        
+        // Add review to product
+        const product = Products.getById(productId);
+        if (!product.reviews) product.reviews = [];
+        
+        product.reviews.push({
+          author: user.name,
+          rating: selectedRating,
+          text: reviewText,
+          date: new Date().toISOString()
+        });
+        
+        // Update product in database
+        Products.update(productId, { reviews: product.reviews });
+        
+        // Reset form
+        document.getElementById('review-text').value = '';
+        stars.forEach(s => s.textContent = '☆');
+        selectedRating = 0;
+        
+        // Reload reviews
+        document.getElementById('reviews-container').innerHTML = '';
+        product.reviews.forEach(review => {
+          const reviewEl = document.createElement('div');
+          reviewEl.className = 'review';
+          reviewEl.innerHTML = `
+            <div class="review-header">
+              <div class="review-author">${review.author}</div>
+              <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+            </div>
+            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+            <div class="review-text">${review.text}</div>
+          `;
+          document.getElementById('reviews-container').appendChild(reviewEl);
+        });
+        
+        document.getElementById('review-count').textContent = `(${product.reviews.length} reviews)`;
+      });
+    }
+
+    function addToCart() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      const quantity = parseInt(document.getElementById('quantity').value);
+      
+      try {
+        Cart.addToCart(productId, quantity);
+        updateCartCount();
+        alert('Product added to cart!');
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function addToWishlist() {
+      const user = ECommerce.getCurrentUser();
+      if (!user) {
+        alert('Please login to add to wishlist');
+        return;
+      }
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      
+      // Get existing wishlists
+      const wishlists = JSON.parse(localStorage.getItem('wishlists')) || {};
+      if (!wishlists[user.id]) wishlists[user.id] = [];
+      
+      // Add product if not already in wishlist
+      if (!wishlists[user.id].includes(productId)) {
+        wishlists[user.id].push(productId);
+        localStorage.setItem('wishlists', JSON.stringify(wishlists));
+        alert('Product added to wishlist!');
+      } else {
+        alert('Product already in your wishlist');
+      }
+    }
+  </script>
+</body>
+</html>

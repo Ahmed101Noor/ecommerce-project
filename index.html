@@ -2,14 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>E-Commerce Home</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-  <div class="container mt-5 text-center">
-    <h1>Welcome to Our E-Commerce Site</h1>
-    <a href="login.html" class="btn btn-primary m-2">Login</a>
-    <a href="register.html" class="btn btn-outline-primary m-2">Register</a>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHOP.CO - Find Clothes That Match Your Style</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <div class="user-actions">
+    <a href="login.html" id="login-link">Login</a>
+    <a href="register.html" id="register-link">Register</a>
   </div>
+</head>
+<body>
+  <header>
+    <div class="logo">SHOP.CO</div>
+    <nav>
+      <ul>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="#">On Sale</a></li>
+        <li><a href="#">New Arrivals</a></li>
+        <li><a href="#">Brands</a></li>
+      </ul>
+    </nav>
+    <div class="search">
+      <input type="text" placeholder="Search for products...">
+    </div>
+    <div class="user-actions">
+      <a href="account.html" id="account-link">Account</a>
+      <a href="cart.html" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>FIND CLOTHES THAT MATCHES YOUR STYLE</h1>
+      <div class="stats">
+        <div>200+ International Brands</div>
+        <div>2,000+ High-Quality Products</div>
+        <div>30,000+ Happy Customers</div>
+      </div>
+    </section>
+
+    <section class="brands">
+      <h2>Featured Brands</h2>
+      <div class="brand-logos">
+        <div>VERSACE</div>
+        <div>ZARA</div>
+        <div>GUCCI</div>
+        <div>PRADA</div>
+        <div>Calvin Klein</div>
+      </div>
+    </section>
+
+    <section class="new-arrivals">
+      <h2>New Arrivals</h2>
+      <div class="products-grid" id="new-arrivals">
+        <!-- Products will be loaded via JavaScript -->
+      </div>
+    </section>
+
+    <section class="top-selling">
+      <h2>Top Selling</h2>
+      <div class="products-grid" id="top-selling">
+        <!-- Products will be loaded via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <!-- Footer content from the design -->
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script>
+    // Initialize some sample data if empty
+    if (Products.getAll().length === 0) {
+      Products.create({
+        name: "Gradient Graphic T-shirt",
+        image: "assets/images/product1.jpg",
+        category: "Casual",
+        price: 145,
+        description: "Comfortable cotton t-shirt with gradient design",
+        stockQuantity: 50
+      });
+      
+      // Add more sample products...
+    }
+
+    // Update cart count
+    function updateCartCount() {
+      const count = Cart.getCart().reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+    }
+
+    // Load products on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+      
+      // Load new arrivals
+      const newArrivals = document.getElementById('new-arrivals');
+      Products.getAll().slice(0, 4).forEach(product => {
+        newArrivals.innerHTML += `
+          <div class="product-card">
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <div class="price">$${product.price}</div>
+            <button onclick="Cart.addToCart('${product.id}', 1)">Add to Cart</button>
+          </div>
+        `;
+      });
+    });
+  </script>
 </body>
 </html>
