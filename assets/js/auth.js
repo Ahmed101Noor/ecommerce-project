@@ -1,4 +1,12 @@
+// At the top of each protected page
+const user = JSON.parse(localStorage.getItem('currentUser'));
+if (!user) {
+  window.location.href = 'login.html';
+}
 class Auth {
+
+
+  
   static validatePassword(password) {
     if (password.length < 6) {
       throw new Error('Password must be at least 6 characters');
@@ -82,7 +90,53 @@ class Auth {
     return JSON.parse(localStorage.getItem('users')) || [];
   }
 
+  static login(email, password) {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (!user) throw new Error('Invalid credentials');
+    
+    // Store current user with role
+    localStorage.setItem('currentUser', JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role // 'admin' or 'customer'
+    }));
+    
+    return user;
+  }
 
+  static register(userData) {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    
+    // Validation
+    if (users.some(u => u.email === userData.email)) {
+      throw new Error('Email already exists');
+    }
+    
+    const newUser = {
+      id: Date.now().toString(),
+      ...userData,
+      role: 'customer' // Default role
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    return newUser;
+  }
+
+  static createAdmin(adminData) {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const newAdmin = {
+      id: Date.now().toString(),
+      ...adminData,
+      role: 'admin'
+    };
+    users.push(newAdmin);
+    localStorage.setItem('users', JSON.stringify(users));
+    return newAdmin;
+  }
 
   
 }

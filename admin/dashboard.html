@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+  <div>
+    <h2>Product Management</h2>
+    <button id="add-product">Add Product</button>
+    <div id="product-list">
+      <!-- Products will be loaded here -->
+    </div>
+  </div>
+
+  <script src="../../assets/js/auth.js"></script>
+  <script>
+    // Verify admin role
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user || user.role !== 'admin') {
+      window.location.href = '../../login.html';
+    }
+
+    // Load products
+    function loadProducts() {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      const container = document.getElementById('product-list');
+      
+      container.innerHTML = products.map(product => `
+        <div class="product-card">
+          <img src="${product.image}" width="100">
+          <h3>${product.name}</h3>
+          <p>$${product.price}</p>
+          <button onclick="editProduct('${product.id}')">Edit</button>
+          <button onclick="deleteProduct('${product.id}')">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    // Initial load
+    loadProducts();
+  </script>
+</body>
+</html>

@@ -1,3 +1,8 @@
+// At the top of each protected page
+const user = JSON.parse(localStorage.getItem('currentUser'));
+if (!user) {
+  window.location.href = 'login.html';
+}
 class Orders {
     static getAll() {
       const user = ECommerce.getCurrentUser();
