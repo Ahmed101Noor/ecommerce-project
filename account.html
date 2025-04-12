@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Account - SHOP.CO</title>
   <link rel="stylesheet" href="assets/css/style.css">
-  <div class="user-actions">
-    <a href="login.html" id="login-link">Login</a>
-    <a href="register.html" id="register-link">Register</a>
-  </div>
-  
 </head>
 <body>
   <header>
@@ -19,16 +14,16 @@
   <main class="account-container">
     <div class="account-sidebar">
       <div class="account-info">
-        <div class="avatar">👤</div>
+        <div class="avatar" aria-label="User Avatar">👤</div>
         <h3 id="account-name">User Name</h3>
         <p id="account-email">user@example.com</p>
       </div>
       <nav class="account-menu">
-        <a href="#dashboard" class="active">Dashboard</a>
-        <a href="#orders">My Orders</a>
-        <a href="#wishlist">Wishlist</a>
-        <a href="#settings">Account Settings</a>
-        <a href="#" id="logout-btn">Logout</a>
+        <a href="#dashboard" class="active" aria-label="Dashboard">Dashboard</a>
+        <a href="#orders" aria-label="My Orders">My Orders</a>
+        <a href="#wishlist" aria-label="Wishlist">Wishlist</a>
+        <a href="#settings" aria-label="Account Settings">Account Settings</a>
+        <a href="#" id="logout-btn" aria-label="Logout">Logout</a>
       </nav>
     </div>
 
@@ -48,7 +43,7 @@
         </div>
         <div class="recent-orders">
           <h3>Recent Orders</h3>
-          <table id="recent-orders-table">
+          <table id="recent-orders-table" aria-label="Recent Orders Table">
             <thead>
               <tr>
                 <th>Order #</th>
@@ -111,6 +106,49 @@
     <!-- Same footer as other pages -->
   </footer>
 
+  <script>
+    // Mock implementations for testing
+    const ECommerce = {
+      getCurrentUser: () => JSON.parse(localStorage.getItem('currentUser')),
+      setCurrentUser: (user) => localStorage.setItem('currentUser', JSON.stringify(user)),
+    };
+
+    const Orders = {
+      getAll: () => JSON.parse(localStorage.getItem('orders')) || [],
+      updateStatus: (orderId, status) => {
+        const orders = Orders.getAll();
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+          order.status = status;
+          localStorage.setItem('orders', JSON.stringify(orders));
+        }
+      },
+    };
+
+    const Products = {
+      getById: (id) => {
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+        return products.find(p => p.id === id);
+      },
+    };
+
+    const Cart = {
+      addToCart: (productId, quantity) => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingItem = cart.find(item => item.productId === productId);
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          cart.push({ productId, quantity });
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+      },
+    };
+
+    const Auth = {
+      logout: () => localStorage.removeItem('currentUser'),
+    };
+  </script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/auth.js"></script>
   <script src="assets/js/products.js"></script>
